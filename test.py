@@ -3,6 +3,10 @@ import time
 from struct import *
 #from bluetooth.ble import DiscoveryService
 
+# 0x00  
+# 0x01 - set interval
+# 0x02, 0x03, 0x04, 0x05 - interval value
+
 ada = pygatt.GATTToolBackend()
 ADDRESS_TYPE = pygatt.BLEAddressType.random
 
@@ -31,16 +35,28 @@ try:
             print(f"    {to_print}")
        # print(c)
     '''
-    value = device.char_read('00000001-0000-1000-8000-00805f9b34fb')
-    print(len(value))
-    # x,y 
-    to_floats = unpack('ff', value)
-    print(to_floats)
+    xytemp_bytes = device.char_read('00000001-0000-1000-8000-00805f9b34fb')
+    battery_bytes = device.char_read('00000003-0000-1000-8000-00805f9b34fb')
+
+    device.char_write('00000002-0000-1000-8000-00805f9b34fb', [0x00]) # LED off
+    time.sleep(2)
+    device.char_write('00000002-0000-1000-8000-00805f9b34fb', [0x02]) # LED on
+
+                                                              #0x01 is command byte (sleep), next 4 are bytes for value
+    device.char_write('00000002-0000-1000-8000-00805f9b34fb', [0x01, 0x00, 0x00, 0x00, 0x0A]) # sleep interval
+    
+    # x,y, temp
+    xytemp = unpack('ffB', xytemp_bytes)
+    battery = unpack('B', battery_bytes)
+    
+    print(xytemp)
+    print(battery)
+    
     device.bond()
     #device.subscribe('00000001-0000-1000-8000-00805f9b34fb',
     #                     callback=data_handler_cb,
     #                    indication=True)
-    print(value)
+   #print(value)
    # val = unpack('f', value)
    # print(val)
 finally:
