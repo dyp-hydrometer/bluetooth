@@ -1,20 +1,21 @@
-import bluetooth
+import pygatt 
 import requests, json
 
 # need a way to differentiate between different hydrometers
 # cant be by address, because that can change?
 
-target_name = "dyp_hydrometer"
-target_address = None
+#target_name = "dyp_hydrometer"
+adapter = pygatt.GATTToolBackend()
+ADDRESS_TYPE = pygatt.BLEAddressType.random
 
-nearby_devices = bluetooth.discover_devices()
+nearby_devices = adapter.scan()
 
-for addr, name in nearby_devices:
-    print(f"{addr} - {name}")
-    if target_name == name:
-        target_address = addr
-        #break
-
+for device in nearby_devices:
+    print(f"{device['address']} - {device['name']}")
+    #if target_name == name:
+    #    target_address = addr
+    #    #break
+'''
 if target_address is not None:
     print ("found target bluetooth device with address ", target_address)
 
@@ -36,13 +37,15 @@ if target_address is not None:
     # insert new record if none exist for this hydrometer
     if not found:
         insert_new = requests.post('http://localhost:5000/api/hydrometers/',
-                                    data=json.dumps({'color':,target["color"] 'battery':taget["battery"]}),
+                                    data=json.dumps({'color':target["color"], 'battery':target["battery"]}),
                                     headers=headers)
 
 
     # poll for new readings and update if found
     while(True):
-        
+       pass 
 
 else:
     print("could not find target bluetooth device nearby")
+    '''
+
