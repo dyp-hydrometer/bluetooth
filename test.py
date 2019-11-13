@@ -1,6 +1,8 @@
 import pygatt
-import time
+import time, math
 from struct import *
+import requsts
+import jsonify
 #from bluetooth.ble import DiscoveryService
 
 # 0x00  
@@ -9,6 +11,8 @@ from struct import *
 
 ada = pygatt.GATTToolBackend()
 ADDRESS_TYPE = pygatt.BLEAddressType.random
+
+headers = {'Content-type': 'application/json'}
 
 def data_handler_cb(handle, value):
     """
@@ -23,11 +27,33 @@ def data_handler_cb(handle, value):
 
 try:
     ada.start()
-    device = ada.connect('F6:8D:14:D4:8D:10', address_type=ADDRESS_TYPE) 
-    
-    characteristics = device.discover_characteristics(100)
 
-    '''for c in characteristics:
+    # don't hardcode this address
+    device = ada.connect('F6:8D:14:D4:8D:10', address_type=ADDRESS_TYPE) 
+
+    address = device.address
+
+    hydro_resp = requests.get(f'http://localhost:5000/api/hydrometers/{address}', headers=headers)
+
+    if hydro_resp.status_code != 200:
+        print(f"no such hydrometer {address}, adding via API")
+        
+        data = {}
+        data["color"] = "#000000"
+        data["battery"] = battery
+        create_resp = requests.put(f'http://localhost:5000/api/hydrometers/', data=json.dumps(data), headers=headers)
+
+        if create_resp.status_code != 200:
+            print("Error with the add hydrometer request, terminating...")
+            return
+        
+        hydro_resp = create_resp
+        
+    hydrometer = jsonify(hydro_resp.text)
+
+    '''characteristics = device.discover_characteristics(100)
+
+    for c in characteristics:
         val = device.char_read(c)
         print(c)
         if len(val) == 8:
@@ -35,22 +61,31 @@ try:
             print(f"    {to_print}")
        # print(c)
     '''
-    xytemp_bytes = device.char_read('00000001-0000-1000-8000-00805f9b34fb')
+    xyz_bytes = device.char_read('00000001-0000-1000-8000-00805f9b34fb')
+    temp_bytes = device.char_read('00000004-0000-1000-8000-00805f9b34fb')
     battery_bytes = device.char_read('00000003-0000-1000-8000-00805f9b34fb')
 
-    device.char_write('00000002-0000-1000-8000-00805f9b34fb', [0x00]) # LED off
-    time.sleep(2)
-    device.char_write('00000002-0000-1000-8000-00805f9b34fb', [0x02]) # LED on
+    #device.char_write('00000002-0000-1000-8000-00805f9b34fb', [0x00]) # LED off
+    #time.sleep(2)
+    #device.char_write('00000002-0000-1000-8000-00805f9b34fb', [0x02]) # LED on
 
-                                                              #0x01 is command byte (sleep), next 4 are bytes for value
-    device.char_write('00000002-0000-1000-8000-00805f9b34fb', [0x01, 0x00, 0x00, 0x00, 0x0A]) # sleep interval
-    
     # x,y, temp
-    xytemp = unpack('ffB', xytemp_bytes)
+    x,y,z = unpack('fff', xyz_bytes)
+    temp = unpack('B', temp_bytes)
     battery = unpack('B', battery_bytes)
-    
-    print(xytemp)
-    print(battery)
+
+    # use get
+    data = {}
+    data["battery"] = battery
+    data["rssi"] = device.get_rssi()
+
+    # TAKEN FROM ISPINDLE https://github.com/universam1/iSpindel/
+    pitch = math.atan2(y, sqrt(x**2 + z**2))) * 180.0 / math.PI
+    roll = math.atan2(x, sqrt(y**2 + z**2))) * 180.0 / math.PI
+    tilt = math.sqrt(pitch**2 + roll**2)
+    data["angle"] = -0.00031 * tilt**2 + 0.557 * tilt - 14.054
+
+    resp = requests.put(f'http://localhost:5000/api/hydrometers/{hydrometer["id"]}/reading/', data=json.dumps(data), headers=headers)
     
     device.bond()
     #device.subscribe('00000001-0000-1000-8000-00805f9b34fb',
