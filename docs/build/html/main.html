@@ -1,0 +1,205 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>main module &#8212; Hydrometer Connection Manager 1.0 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="module-main">
+<span id="main-module"></span><h1>main module<a class="headerlink" href="#module-main" title="Permalink to this headline">¶</a></h1>
+<span class="target" id="module-main"></span><dl class="class">
+<dt id="main.Reading">
+<em class="property">class </em><code class="sig-prename descclassname">main.</code><code class="sig-name descname">Reading</code><span class="sig-paren">(</span><em class="sig-param">hydrometer</em><span class="sig-paren">)</span><a class="headerlink" href="#main.Reading" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Class to get, store, and update reading info</p>
+<p>Utilizes the flask API to store reading info to the database</p>
+<dl class="method">
+<dt id="main.Reading.check_for_interval_update">
+<code class="sig-name descname">check_for_interval_update</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#main.Reading.check_for_interval_update" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sends API GET request for the hydrometer stored when initializing the class.
+Updates the interval if a 200 response recieved, otherwise prints that an error occured</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="main.Reading.data_cb">
+<code class="sig-name descname">data_cb</code><span class="sig-paren">(</span><em class="sig-param">handle</em>, <em class="sig-param">value</em><span class="sig-paren">)</span><a class="headerlink" href="#main.Reading.data_cb" title="Permalink to this definition">¶</a></dt>
+<dd><p>PyGaTT callback used when the hydrometer notifies that the xyztemp characteristic has updated.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>Handle
+Value</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="main.Reading.hydrometer">
+<code class="sig-name descname">hydrometer</code><em class="property"> = None</em><a class="headerlink" href="#main.Reading.hydrometer" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="main.Reading.send">
+<code class="sig-name descname">send</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#main.Reading.send" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sends API PUT request to insert a new row for the current reading. Also calculated the SG by using the function returned by the tilts.py calibration tool.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="main.Reading.temp">
+<code class="sig-name descname">temp</code><em class="property"> = 0</em><a class="headerlink" href="#main.Reading.temp" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="main.Reading.update_battery">
+<code class="sig-name descname">update_battery</code><span class="sig-paren">(</span><em class="sig-param">battery</em><span class="sig-paren">)</span><a class="headerlink" href="#main.Reading.update_battery" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sends API PUT request to update the current battery level for the connected hydrometer</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>Battery level</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="main.Reading.x">
+<code class="sig-name descname">x</code><em class="property"> = 0.0</em><a class="headerlink" href="#main.Reading.x" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="main.Reading.y">
+<code class="sig-name descname">y</code><em class="property"> = 0.0</em><a class="headerlink" href="#main.Reading.y" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="main.Reading.z">
+<code class="sig-name descname">z</code><em class="property"> = 0.0</em><a class="headerlink" href="#main.Reading.z" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="main.get_or_create_hydrometer">
+<code class="sig-prename descclassname">main.</code><code class="sig-name descname">get_or_create_hydrometer</code><span class="sig-paren">(</span><em class="sig-param">addr</em><span class="sig-paren">)</span><a class="headerlink" href="#main.get_or_create_hydrometer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks if the newly connected hydrometer exists in the database, creates a new entry if it doesn’t exist, and returns the hydrometer data</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>MAC_ADDR</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="main.handle_connection">
+<code class="sig-prename descclassname">main.</code><code class="sig-name descname">handle_connection</code><span class="sig-paren">(</span><em class="sig-param">addr</em><span class="sig-paren">)</span><a class="headerlink" href="#main.handle_connection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Main logic for a hydrometer’s connection thread. Exists gracefully on a connection error</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>MAC_ADDR</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="main.run">
+<code class="sig-prename descclassname">main.</code><code class="sig-name descname">run</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#main.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Infinite loop searching for new, unconnected hydrometers and connecting to them with new threads for each</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">Hydrometer Connection Manager</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2019, Dyp Hydrometer.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.2.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/main.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
